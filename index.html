@@ -244,7 +244,7 @@ details.hist summary{cursor:pointer;font-weight:700}
     <div class="inner">
       <div class="tbl-box">
         <table>
-          <thead><tr><th>時刻</th><th>合成 mm/h</th><th>一致度</th><th>ナウキャスト</th><th>Yahoo!</th><th>気象庁MSM</th><th>ECMWF</th><th>ICON</th><th>GFS</th></tr></thead>
+          <thead><tr><th>時刻</th><th>合成 mm/h</th><th>雨と予想した割合</th><th>ナウキャスト</th><th>Yahoo!</th><th>気象庁MSM</th><th>ECMWF</th><th>ICON</th><th>GFS</th></tr></thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
@@ -258,7 +258,7 @@ details.hist summary{cursor:pointer;font-weight:700}
         <button type="button" id="go" class="ghost">この地点で更新</button>
       </div>
       <p class="note">
-        雨の予報は、気象庁の高解像度降水ナウキャストとYahoo!の降水予測(どちらも5分間隔のレーダー予測)を中心にし、数値予報モデル(気象庁MSMを2倍の重み)で補って合成しています。「一致度」は雨(0.2mm/h以上)と予想した情報源の割合です。
+        雨の予報は、気象庁の高解像度降水ナウキャストとYahoo!の降水予測(どちらも5分間隔のレーダー予測)を中心にし、数値予報モデル(気象庁MSMを2倍の重み)で補って合成しています。「予報の一致度」は、表示している予報(雨が降る/降らない)と同じ予想をしている情報源の割合です。表の「雨と予想した割合」は、各時刻に雨(0.2mm/h以上)と予想した情報源の割合です。どちらも降水確率ではありません。
         月・惑星の位置、満ち欠け、月の出入りは端末内で天文計算しています(数分・1度程度の誤差があります。惑星はJPLの近似軌道要素を使用)。二十四節気・流星群・日食などの日付は国立天文台の暦をもとにしています(2028年以降の流星群は例年の日付です)。お気に入りと履歴は、このブラウザの中にだけ保存されます。「見えるか」の判定は月の高さ、空の明るさ(太陽の高さ)、雲の量(予報値)から出した目安です。
         光化学スモッグ欄はCAMSのオゾン予測(約10km四方の平均)を光化学オキシダント濃度の目安に換算したもので、自治体の注意報そのものではありません。実際の発令は<a href="https://soramame.env.go.jp/" target="_blank" rel="noopener">環境省 そらまめくん</a>や都道府県の発表で確認してください。
         データ: <a href="https://www.jma.go.jp/bosai/nowc/" target="_blank" rel="noopener">気象庁</a>、<a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>(CC BY 4.0)、<a href="https://developer.yahoo.co.jp/sitemap/" target="_blank" rel="noopener">Web Services by Yahoo! JAPAN</a>、<a href="https://maps.gsi.go.jp/" target="_blank" rel="noopener">国土地理院</a>。防災の判断には必ず気象庁の発表を確認してください。
@@ -853,7 +853,8 @@ function renderRain(rows,src,w){
     msg = stop===-1 ? `いま${word(rows[0].val)}。しばらく続きそう` : `いま${word(rows[0].val)}。${hm(new Date(rows[stop].t))}ごろやみそう`;
     sub="傘を持っていってね"; kind="rain";
   } else { msg=`${rows[wetIdx].lead}分後ごろから${word(rows[wetIdx].val)}`; sub=`${hm(new Date(rows[wetIdx].t))}ごろから。傘を持っていってね`; kind="rain"; }
-  const a = wetIdx===-1? rows[0].agree : rows[wetIdx].agree;
+  // agreement = share of sources backing this verdict (rain → share predicting rain, no rain → share predicting dry)
+  const a = wetIdx===-1? (rows[0].agree==null?null:1-Math.max(...rows.map(r=>r.agree??0))) : rows[wetIdx].agree;
   if(a!=null) sub += `(予報の一致度 ${Math.round(a*100)}%)`;
   if(wetIdx>=0 && peak.val>=1) sub += `・いちばん強いのは${hm(new Date(peak.t))}ごろ`;
   $("verdict").textContent=msg; $("vmeta").textContent=sub;
