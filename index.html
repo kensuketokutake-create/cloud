@@ -266,6 +266,23 @@ details.hist summary{cursor:pointer;font-weight:700}
 .fm-cands{display:flex;flex-wrap:wrap;gap:6px}
 .fm-cands button{font-size:.82rem;padding:3px 12px;background:var(--panel);color:var(--fg);border-color:var(--line);font-weight:500}
 
+/* air quality */
+.aq-items{display:grid;gap:10px;margin-top:10px}
+.aq{display:grid;grid-template-columns:7.2em 1fr;gap:4px 10px;align-items:center}
+.aq .nm{font-weight:700;font-size:.88rem;line-height:1.3}
+.aq .nm small{display:block;font-weight:500;color:var(--muted);font-size:.7rem}
+.aq .vals{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;font-size:.8rem;font-variant-numeric:tabular-nums}
+.aq .lvchip{font-size:.72rem;font-weight:700;color:#fff;border-radius:999px;padding:0 8px}
+.aq .meter{grid-column:2;margin:0}
+.aqstrip{display:grid;grid-template-columns:repeat(24,1fr);gap:2px;margin-top:12px}
+.aqstrip i{height:14px;border-radius:4px}
+.aqcap{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)}
+.advice{list-style:none;margin:12px 0 0;padding:12px 14px;border-radius:16px;background:var(--panel2);display:grid;gap:6px}
+.advice li{display:grid;grid-template-columns:20px 1fr;gap:6px;font-size:.9rem;line-height:1.5}
+.advice li::before{content:"";width:14px;height:14px;margin-top:4px;border-radius:5px;background:var(--mint)}
+.aqopt{display:flex;gap:8px;align-items:center;font-size:.82rem;color:var(--muted);margin-top:10px}
+.aqopt input{width:20px;height:20px;accent-color:var(--accent);padding:0}
+
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .hero-top svg{animation:bob 3.2s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.hero-top svg{animation:none}}
@@ -386,7 +403,14 @@ details.hist summary{cursor:pointer;font-weight:700}
 
   <section class="card" style="--tag:var(--pink)"><h2 id="calTitle">今月のお空カレンダー</h2><ul class="cal" id="cal"></ul></section>
 
-  <section class="card air" style="--tag:var(--mint)"><h2>光化学スモッグ(オゾンの予測)</h2><div id="ox">–</div></section>
+  <section class="card air" style="--tag:var(--mint)"><h2>空気のきれいさ(PM2.5・黄砂・光化学スモッグ)</h2>
+    <div class="lead" id="aqLead">–</div><div class="sub2" id="aqSub"></div>
+    <div class="aq-items" id="aqItems"></div>
+    <div class="note2" style="margin-top:12px">この先24時間の空気(1マス=1時間)</div><div class="aqstrip" id="aqStrip" style="margin-top:4px"></div><div class="aqcap" id="aqCap"></div>
+    <ul class="advice" id="aqAdvice"></ul>
+    <label class="aqopt"><input type="checkbox" id="aqSens" checked> 呼吸器が弱い家族に合わせて、早めに注意を出す</label>
+    <div class="note2">CAMS(ヨーロッパの大気予報、約10km四方の平均)の予測値を使った目安です。花粉は日本向けのデータがないため表示していません。実際の測定値は<a href="https://soramame.env.go.jp/" target="_blank" rel="noopener">環境省 そらまめくん</a>、黄砂は<a href="https://www.data.jma.go.jp/env/kosateller/kosa/" target="_blank" rel="noopener">気象庁 黄砂情報</a>、光化学スモッグ注意報は都道府県の発表で確認してください。</div>
+  </section>
 
   <details class="more">
     <summary>くわしいデータと設定</summary>
@@ -409,7 +433,7 @@ details.hist summary{cursor:pointer;font-weight:700}
       <p class="note">
         雨の予報は、気象庁の高解像度降水ナウキャストとYahoo!の降水予測(どちらも5分間隔のレーダー予測)を中心にし、数値予報モデル(気象庁MSMを2倍の重み)で補って合成しています。「予報の一致度」は、表示している予報(雨が降る/降らない)と同じ予想をしている情報源の割合です。表の「雨と予想した割合」は、各時刻に雨(0.2mm/h以上)と予想した情報源の割合です。どちらも降水確率ではありません。
         月・惑星の位置、満ち欠け、月の出入りは端末内で天文計算しています(数分・1度程度の誤差があります。惑星はJPLの近似軌道要素を使用)。二十四節気・流星群・日食などの日付は国立天文台の暦をもとにしています(2028年以降の流星群は例年の日付です)。お気に入り・履歴・おでかけ中の家族の登録は、このブラウザの中にだけ保存されます。家族の気づかいポイントは、行き先と自分の地点の今日・あしたの予報(Open-Meteo)を比べて作っています。実況と「さっきまでの30分」の気温・湿度・雨量・風は、いちばん近い気象庁アメダス観測所の10分ごとの実測値です(湿度を測っている観測所は少ないため、少し離れた観測所の値になることがあります)。天気(晴れ・くもり)は日照時間と雨量からの推定で、夜は予報モデルの値を使います。体感気温と突風はOpen-Meteoの値です。上空の寒気・気圧の谷は、Open-Meteoの500hPa(上空約5,500m)の気温・高度・風と、大気の不安定さ(CAPE・リフティド指数)から判定しています。渦度は地点の東西南北約80kmの上空の風から計算しています。寒気の目安の気温は季節で変えています(夏は-6℃以下、冬は-30℃以下など)。自転車ナビの雨雲の距離と速さは、気象庁ナウキャストの画像から推定しています。風マップの地図は国土地理院の淡色地図で、細い矢印は約5km間隔の予報モデルの現在値、白ふちの丸と太い矢印はアメダスの実測値です。雷は気象庁の雷ナウキャスト(約5km以内の最大の活動度)から判定しています。「見えるか」の判定は月の高さ、空の明るさ(太陽の高さ)、雲の量(予報値)から出した目安です。
-        光化学スモッグ欄はCAMSのオゾン予測(約10km四方の平均)を光化学オキシダント濃度の目安に換算したもので、自治体の注意報そのものではありません。実際の発令は<a href="https://soramame.env.go.jp/" target="_blank" rel="noopener">環境省 そらまめくん</a>や都道府県の発表で確認してください。
+        空気のきれいさは、CAMSのPM2.5・黄砂(ダスト)・オゾン・PM10・二酸化窒素の予測値を、環境基準やPM2.5の注意喚起の目安(日平均70μg/m³)などと比べて5段階にしたものです。オゾンは光化学オキシダント濃度の目安に換算しています。自治体の注意報そのものではありません。
         データ: <a href="https://www.jma.go.jp/bosai/nowc/" target="_blank" rel="noopener">気象庁</a>、<a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>(CC BY 4.0)、<a href="https://developer.yahoo.co.jp/sitemap/" target="_blank" rel="noopener">Web Services by Yahoo! JAPAN</a>、<a href="https://maps.gsi.go.jp/" target="_blank" rel="noopener">国土地理院</a>。防災の判断には必ず気象庁の発表を確認してください。
       </p>
     </div>
@@ -542,7 +566,7 @@ async function fetchWeather(lat,lon){
 }
 async function fetchOzone(lat,lon){
   const u = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}`+
-    `&hourly=ozone&timezone=Asia%2FTokyo&forecast_days=2`;
+    `&hourly=pm2_5,pm10,dust,ozone,nitrogen_dioxide&timezone=Asia%2FTokyo&forecast_days=2`;
   return (await getJSON(u)).hourly;
 }
 function uvLabel(u){ if(u==null) return ""; u=Math.round(u); return u<=2?"弱い":u<=5?"中くらい":u<=7?"強い":u<=10?"とても強い":"極端に強い"; }
@@ -728,7 +752,7 @@ async function fetchThunder(lat,lon){
 const THUNDER_WORD=["雷の心配なし","雷の可能性あり","雷あり","やや激しい雷","激しい雷"];
 
 // ---------- render: now (observed) & past 30 minutes ----------
-function renderNow(w,am,amErr,th,thErr){
+function renderNow(w,am,amErr,th,thErr,rows){
   const {lat,lon}=place;
   const big=$("obsBig"); big.textContent=""; const nl=$("nowLine"); nl.textContent=""; $("nowTip").textContent=""; $("obsSrc").textContent="";
   const c=w?.current;
@@ -785,14 +809,22 @@ function renderNow(w,am,amErr,th,thErr){
       const cell=el("div","pc"+(i===am.series.length-1?" latest":""));
       const mins=Math.round((am.time-r.t)/MIN);
       cell.appendChild(el("div","t", mins===0?`${hm(new Date(r.t))} 最新`:`${hm(new Date(r.t))}`));
-      const ow=obsWeather(r,lat,lon,w); cell.appendChild(icon(ow.kind)); cell.appendChild(el("div","w",ow.text+(ow.est?"*":"")));
+      // radar at this exact spot (same source as the rain graph above), averaged over the 10 minutes
+      const rr=(rows||[]).filter(x=>x.lead<=0 && x.t>r.t-10*MIN && x.t<=r.t+2.5*MIN);
+      const rv=rr.length? Math.max(...rr.map(x=>x.n ?? x.y ?? x.val ?? 0)) : null;
+      let ow=obsWeather(r,lat,lon,w);
+      const gaugeDry = r.precipitation10m==null || r.precipitation10m===0;
+      if(rv!=null && rv>=RAIN && gaugeDry) ow={kind:"rain", text: rv<1?"小雨":"雨", est:false, radar:true};
+      cell.appendChild(icon(ow.kind)); cell.appendChild(el("div","w",ow.text+(ow.est?"*":ow.radar?"†":"")));
       cell.appendChild(el("div","tp", r.temp==null?"–":`${r.temp.toFixed(1)}℃`));
       cell.appendChild(el("div","h", `湿度 ${r.humidity==null?"–":Math.round(r.humidity)+"%"}`));
-      cell.appendChild(el("div","h", `雨 ${r.precipitation10m==null?"–":r.precipitation10m.toFixed(1)+"mm"}`));
+      cell.appendChild(el("div","h", `雨量計 ${r.precipitation10m==null?"–":r.precipitation10m.toFixed(1)+"mm"}`));
+      if(rv!=null) cell.appendChild(el("div","h", `レーダー ${rv<RAIN?"なし":rv<1?"弱い雨":word(rv)}`));
       cell.appendChild(el("div","h", `風 ${r.wind==null?"–":r.wind.toFixed(1)+"m/s"}`));
       pb.appendChild(cell);
     });
-    $("pastSrc").textContent="10分ごとの実測値(雨は10分間の雨量)。* は夜などで日照がないため予報モデルからの推定";
+    const pst=am.st.precipitation10m;
+    $("pastSrc").textContent=`10分ごとの実測値。「雨量計」は${pst?`${pst.name}(${pst.d.toFixed(0)}km先)`:"近くのアメダス"}の10分間の雨量で、0.5mm単位で測るため弱い雨は0.0mmになります。「レーダー」はこの場所の雨雲レーダーの値で、上の雨のグラフと同じです。† はレーダーだけがとらえた弱い雨、* は夜などで日照がないため予報モデルからの推定`;
   } else pb.textContent = amErr? `取れなかったよ(${amErr})` : "–";
 
   // thunder alert
@@ -1639,10 +1671,11 @@ function renderRain(rows,src,w){
   const allRows = rows; rows = rows.filter(r=>r.lead>=0);
   const wetIdx = rows.findIndex(r=>(r.val||0)>=RAIN);
   const peak = rows.reduce((a,r)=>(r.val||0)>(a.val||0)?r:a, rows[0]);
-  const pastWet = allRows.filter(r=>r.lead<0 && (r.val||0)>=RAIN).length;
+  const pastWetRows = allRows.filter(r=>r.lead<0 && (r.val||0)>=RAIN); const pastWet=pastWetRows.length;
+  const pastMax = pastWet? Math.max(...pastWetRows.map(r=>r.val)) : 0;
   let msg, sub="", kind;
   if(rows.every(r=>r.val==null)){ msg="雨のデータが取れなかったよ"; sub="下の「くわしいデータ」で理由を見てね"; kind="cloud"; }
-  else if(wetIdx===-1){ msg="30分は雨の心配なし"; sub= pastWet? "さっきまで降っていたけど、もうやみそう" : "傘はいらなさそう"; kind = w&&w.current ? wxKind(w.current.weather_code) : "sun"; if(kind==="rain"||kind==="bolt") kind="cloud"; }
+  else if(wetIdx===-1){ msg="30分は雨の心配なし"; sub= pastWet? (pastMax<1 ? "さっきまで弱い雨がパラついていたみたい(雨雲レーダー)。もうやみそう" : "さっきまで降っていたけど、もうやみそう") : "傘はいらなさそう"; kind = w&&w.current ? wxKind(w.current.weather_code) : "sun"; if(kind==="rain"||kind==="bolt") kind="cloud"; }
   else if(wetIdx===0){
     const stop = rows.findIndex(r=>(r.val||0)<RAIN);
     msg = stop===-1 ? `いま${word(rows[0].val)}。しばらく続きそう` : `いま${word(rows[0].val)}。${hm(new Date(rows[stop].t))}ごろやみそう`;
@@ -1713,26 +1746,72 @@ function renderWeather(w,err,oz,ozErr){
 
   renderMoon(w,now);
 
-  // photochemical smog
-  const ob=$("ox"); ob.textContent="";
-  if(oz && oz.time){
-    const todayKey=jstKey(now).slice(0,10), nowKey=jstKey(now).slice(0,13);
-    let peak=null, pt=null;
-    const scan = cond => oz.time.forEach((t,i)=>{ if(cond(t) && oz.ozone[i]!=null && (peak==null||oz.ozone[i]>peak)){peak=oz.ozone[i]; pt=t;} });
-    scan(t=>t.startsWith(todayKey) && t.slice(0,13)>=nowKey);
-    if(peak==null) scan(t=>t.startsWith(todayKey));
-    if(peak!=null){
-      const ppm=peak/1960; // 1 ppm O3 ≈ 1960 µg/m³
-      const [lv,col,tip] = ppm>=0.12?["注意報レベルかも","var(--bad)","外遊びは控えめにして、自治体の発表を確認してね"]
-        : ppm>=0.10?["高め","var(--warn)","目がちかちかしたら屋内で休もう"]
-        : ppm>=0.06?["ちょっと高め","var(--butter)","ふだんどおりで大丈夫"]
-        : ["きれいな空気","var(--ok)","安心して外で遊べそう"];
-      const l=el("div","lv",lv); l.style.color=col; ob.appendChild(l);
-      ob.appendChild(el("div","sm",`今日この先の最大 約${ppm.toFixed(3)} ppm(${+pt.slice(11,13)}時ごろ)・${tip}`));
-      const m=el("div","meter"); const bar=document.createElement("i"); bar.style.width=Math.min(100,ppm/0.16*100)+"%"; bar.style.background=col; m.appendChild(bar); ob.appendChild(m);
-      const sc=el("div","scale"); ["0","0.06 基準","0.12 注意報","0.16"].forEach(x=>sc.appendChild(el("span",null,x))); ob.appendChild(sc);
-    } else ob.textContent="今日のデータがありません";
-  } else ob.textContent = ozErr? `取れなかったよ(${ozErr})` : "–";
+  renderAir(oz,ozErr,w,now);
+}
+
+// ---------- air quality ----------
+const AQ_LV=[["きれい","var(--ok)"],["ふつう","var(--sky)"],["ちょっと注意","var(--butter)"],["注意","var(--warn)"],["外出はひかえめに","var(--bad)"]];
+const AQ_ITEMS=[ // thresholds (hourly, µg/m³ unless noted) for levels 1..4
+  {key:"pm2_5", name:"PM2.5", sub:"とても小さな粒", unit:"µg/m³", th:[15,35,50,70], max:100},
+  {key:"dust", name:"黄砂", sub:"大陸から飛ぶ砂", unit:"µg/m³", th:[20,50,100,200], max:250},
+  {key:"ozone", name:"光化学スモッグ", sub:"オキシダント", unit:"ppm", conv:v=>v/1960, th:[0.04,0.06,0.10,0.12], max:0.16, dp:3},
+  {key:"pm10", name:"PM10", sub:"ほこり・粒子", unit:"µg/m³", th:[50,100,150,200], max:250},
+  {key:"nitrogen_dioxide", name:"二酸化窒素", sub:"車の排気ガスなど", unit:"ppm", conv:v=>v/1880, th:[0.02,0.04,0.06,0.10], max:0.12, dp:3},
+];
+function aqLevel(item,v,sens){ if(v==null) return null; const f=sens?0.75:1; let lv=0; item.th.forEach(t=>{ if(v>=t*f) lv++; }); return lv; }
+function renderAir(oz,err,w,now){
+  const lead=$("aqLead"), sub=$("aqSub"), items=$("aqItems"), strip=$("aqStrip"), cap=$("aqCap"), adv=$("aqAdvice");
+  lead.className="lead"; items.textContent=""; strip.textContent=""; cap.textContent=""; adv.textContent=""; sub.textContent="";
+  if(!oz?.time){ lead.textContent = err? `空気のデータが取れなかったよ(${err})` : "–"; return; }
+  const sens=$("aqSens").checked;
+  const nowKey=jstKey(now).slice(0,13); let i0=oz.time.findIndex(t=>t.slice(0,13)===nowKey); if(i0<0) i0=0;
+  const i1=Math.min(oz.time.length-1,i0+23);
+  const val=(it,i)=>{ const v=oz[it.key]?.[i]; return v==null?null:(it.conv?it.conv(v):v); };
+  // per-hour overall level
+  const hours=[]; for(let i=i0;i<=i1;i++){ let lv=null, by=null; AQ_ITEMS.forEach(it=>{ const l=aqLevel(it,val(it,i),sens); if(l!=null&&(lv==null||l>lv)){lv=l;by=it;} }); hours.push({t:oz.time[i],lv,by}); }
+  const nowH=hours[0]; const peak=hours.reduce((a,h)=>(h.lv??-1)>(a.lv??-1)?h:a,hours[0]);
+  const lvTxt=AQ_LV[peak.lv??0];
+  const leadMap=["今日の空気はきれい","空気はふつう","空気がちょっと汚れ気味","空気が汚れているよ","空気がとても汚れているよ"];
+  lead.textContent=leadMap[peak.lv??0]; lead.classList.add((peak.lv??0)>=3?"bad":(peak.lv??0)>=2?"warn":"ok");
+  if((peak.lv??0)>=1 && peak.by) sub.textContent=`いちばん気になるのは ${peak.by.name}(${whenLabel(peak.t)})・いま「${AQ_LV[nowH.lv??0][0]}」`;
+  else sub.textContent="この先24時間、気になる汚れはなさそう";
+  // items
+  AQ_ITEMS.forEach(it=>{
+    const vn=val(it,i0); let pk=null, pt=null; for(let i=i0;i<=i1;i++){ const v=val(it,i); if(v!=null&&(pk==null||v>pk)){pk=v;pt=oz.time[i];} }
+    if(vn==null && pk==null) return;
+    const lv=aqLevel(it,pk,sens);
+    const row=el("div","aq"); const nm=el("div","nm",it.name); nm.appendChild(el("small",null,it.sub)); row.appendChild(nm);
+    const vals=el("div","vals"); const f=v=>v==null?"–":(it.dp?v.toFixed(it.dp):Math.round(v));
+    vals.append(`いま ${f(vn)}`, el("span",null,`・最大 ${f(pk)} ${it.unit}`));
+    const chip=el("span","lvchip",AQ_LV[lv??0][0]); chip.style.background=AQ_LV[lv??0][1]; if((lv??0)===1||(lv??0)===2) chip.style.color="#4a3550"; vals.appendChild(chip);
+    row.appendChild(vals);
+    const m=el("div","meter"); const bar=document.createElement("i"); bar.style.width=Math.min(100,(pk??0)/it.max*100)+"%"; bar.style.background=AQ_LV[lv??0][1]; m.appendChild(bar); row.appendChild(m);
+    items.appendChild(row);
+  });
+  // 24h strip
+  hours.forEach(h=>{ const i=document.createElement("i"); i.style.background=h.lv==null?"var(--line)":AQ_LV[h.lv][1]; i.title=`${+h.t.slice(11,13)}時 ${h.lv==null?"–":AQ_LV[h.lv][0]}${h.by?`(${h.by.name})`:""}`; strip.appendChild(i); });
+  const c1=hours[0]?.t, c2=hours[12]?.t, c3=hours[hours.length-1]?.t;
+  [c1,c2,c3].forEach(t=>cap.appendChild(el("span",null,t?`${+t.slice(11,13)}時`:"")));
+  // advice
+  const lvOf=k=>{ const it=AQ_ITEMS.find(x=>x.key===k); let m=null; for(let i=i0;i<=i1;i++){ const l=aqLevel(it,val(it,i),sens); if(l!=null&&(m==null||l>m)) m=l; } return m??0; };
+  const pm=lvOf("pm2_5"), du=lvOf("dust"), ox=lvOf("ozone"), pl=peak.lv??0;
+  const tips=[];
+  if(pl>=4) tips.push([10,"不要不急の外出はひかえて、窓を閉めて過ごそう"]);
+  if(pm>=2) tips.push([9,"外ではマスクを。PM2.5には、すき間なくつけた不織布マスクや高性能マスク(N95・DS2など)が効果的"]);
+  if(du>=2) tips.push([8,"黄砂が多め。マスクとメガネをして、洗濯物や布団は部屋干しに"]);
+  if(ox>=2) tips.push([8,"昼すぎから夕方は光化学スモッグに注意。外での激しい運動はひかえめに"]);
+  if(pl>=3) tips.push([7,"窓を閉めて、空気清浄機があれば使おう。外出は短めに"]);
+  if(pl>=2) tips.push([6,"帰ったら、手洗い・うがい・洗顔で粒を落とそう"]);
+  const hum=w?.current?.relative_humidity_2m, tc=w?.current?.temperature_2m, d=w?.daily;
+  if(hum!=null && hum<40) tips.push([5,"空気が乾燥しているよ。マスクでのどをうるおし、部屋は加湿しよう"]);
+  if(tc!=null && tc<=8) tips.push([5,"冷たい空気は咳のもと。マスクで口元をあたためよう"]);
+  if(d?.temperature_2m_max?.[0]!=null && d.temperature_2m_max[0]-d.temperature_2m_min[0]>=10) tips.push([4,"寒暖差が大きい日。咳が出やすいので、羽織るものを持って行こう"]);
+  if(sens && pl>=2) tips.push([3,"お医者さんから処方されているお薬があれば、持ち歩くと安心"]);
+  if(!tips.length) tips.push([1, pl<=0 ? "空気はきれい。窓を開けて換気するチャンス" : "ふだんどおりで大丈夫。気になる人はマスクを"]);
+  tips.sort((a,b)=>b[0]-a[0]).slice(0,4).forEach(([,t])=>adv.appendChild(el("li",null,t)));
+  // reflect in the "now" card
+  if(pl>=2){ const nl=$("nowLine"); if(nl && !nl.querySelector(".aqpill")){ const p=el("span","pill aqpill",`空気: ${AQ_LV[pl][0]}`); nl.appendChild(p); }
+    const nt=$("nowTip"); if(nt && pm+du>=2 && !nt.textContent.includes("マスク")) nt.textContent = (nt.textContent?nt.textContent+"。":"") + "空気が汚れ気味。外ではマスクをしよう"; }
 }
 
 function renderMoon(w,now){
@@ -1911,7 +1990,7 @@ function renderTopics(w,now){
 // ---------- state & flow ----------
 let place = DEFAULT_PLACE;
 let running = 0;
-let lastWeather = null, lastUp = null, lastBike = null;
+let lastWeather = null, lastUp = null, lastBike = null, lastAir = null;
 function loadList(k){ try{ const v=JSON.parse(load(k)||"[]"); return Array.isArray(v)?v.filter(x=>x&&isFinite(x.lat)&&isFinite(x.lon)&&x.name):[]; }catch(e){ return []; } }
 const samePlace=(a,b)=>a&&b&&Math.abs(a.lat-b.lat)<0.005&&Math.abs(a.lon-b.lon)<0.005;
 let favs=loadList("ab-favs").slice(0,3), hist=loadList("ab-hist").slice(0,10);
@@ -1987,7 +2066,8 @@ async function run(){
     else src.push([false,md.label,`取得できませんでした(${r.reason?.message||"不明"})`]);
   });
   src.push(w? [true,"天気・湿度・紫外線・雲","Open-Meteo"] : [false,"天気・湿度・紫外線・雲",`取得できませんでした(${wr.reason?.message})`]);
-  src.push(or.status==="fulfilled"? [true,"オゾン予測","CAMS(Open-Meteo 経由)"] : [false,"オゾン予測",`取得できませんでした(${or.reason?.message})`]);
+  src.push(or.status==="fulfilled"? [true,"空気(PM2.5・黄砂・オゾンなど)","CAMS(Open-Meteo 経由)"] : [false,"空気(PM2.5・黄砂・オゾンなど)",`取得できませんでした(${or.reason?.message})`]);
+  lastAir = or.status==="fulfilled"? or.value : null;
   src.push(ar.status==="fulfilled"? [true,"気象庁 アメダス",`${hm(new Date(ar.value.time))} 観測`] : [false,"気象庁 アメダス",`取得できませんでした(${ar.reason?.message})`]);
   src.push(tr.status==="fulfilled"? [true,"気象庁 雷ナウキャスト",`${hm(new Date(tr.value.basetime))} 解析 + 1時間先まで`] : [false,"気象庁 雷ナウキャスト",`取得できませんでした(${tr.reason?.message})`]);
   src.push(ur.status==="fulfilled"? [true,"上空500hPa・気圧","Open-Meteo"+(ur.value.vort?"":"(渦度は計算できませんでした)")] : [false,"上空500hPa・気圧",`取得できませんでした(${ur.reason?.message})`]);
@@ -2001,7 +2081,7 @@ async function run(){
   radarField(nc,lat,lon).then(f=>{ if(my!==running) return; lastBike.field=f; renderBike(rows,nc,w,lastBike.am,f); }).catch(()=>{});
   renderTopics(w,Date.now());
   renderNow(w, ar.status==="fulfilled"?ar.value:null, ar.status==="rejected"?ar.reason.message:null,
-               tr.status==="fulfilled"?tr.value:null, tr.status==="rejected"?tr.reason.message:null);
+               tr.status==="fulfilled"?tr.value:null, tr.status==="rejected"?tr.reason.message:null, rows);
   renderFamily(w);
   renderWindMap(gr.status==="fulfilled"?gr.value:null, gr.status==="rejected"?gr.reason.message:null, ar.status==="fulfilled"?ar.value:null);
   renderWeather(w, wr.status==="rejected"?wr.reason.message:null,
@@ -2046,6 +2126,8 @@ $("go").addEventListener("click",()=>{
   $("cands").textContent=""; setPlace({name:`北緯${lat.toFixed(3)} 東経${lon.toFixed(3)}`, lat, lon});
 });
 $("yid").addEventListener("change",run);
+$("aqSens").checked = load("ab-aqsens")!=="0";
+$("aqSens").addEventListener("change",()=>{ store("ab-aqsens",$("aqSens").checked?"1":"0"); if(lastAir) renderAir(lastAir,null,lastWeather,Date.now()); });
 setupFamilyForm();
 $("commute").value = load("ab-commute") || "20";
 $("commute").addEventListener("change",()=>{ store("ab-commute",$("commute").value); if(lastBike) renderBike(lastBike.rows,lastBike.nc,lastBike.w,lastBike.am,lastBike.field); });
